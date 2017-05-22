@@ -12,6 +12,8 @@
 #
 
 import sys, csv
+from decimal import Decimal
+import decimal
 
 def settle(balance):
     """Solve for the transaction to be done given a list of balances. When the
@@ -28,8 +30,10 @@ def settle(balance):
                in the input and amount is always positive.
     """
     # check that sum vanishes
-    if(sum(balance.values())!=0):
-        raise ValueError("total balance is non-vanishing!")
+    tot = sum(balance.values())
+    if(tot!=Decimal(0)):
+        #raise ValueError("total balance is non-vanishing! (tot={})".format(tot))
+        print "\nNote that there is a total imbalance of {}.".format(tot)
     # erase 0 balances and transform to list
     balance = [ { 'name' : i, 'balance': balance[i] } for i in balance
                                                       if balance[i]!=0 ]
@@ -39,11 +43,11 @@ def settle(balance):
         # sort by increasing balance
         balance.sort(key = lambda x: x['balance'])
         # add payement
-        payements.append({ 'out' : balance[ 0]['name'],
-                           'in'  : balance[-1]['name'],
-                           'amount' : -balance[0]['balance'] })
-        balance[-1]['balance'] += balance[0]['balance']
-        balance.pop(0)
+        payements.append({ 'out' : balance[-1]['name'],
+                           'in'  : balance[ 0]['name'],
+                           'amount' : balance[-1]['balance'] })
+        balance[0]['balance'] += balance[-1]['balance']
+        balance.pop(-1)
 
     return payements
 
@@ -64,31 +68,39 @@ def get_balance(filename):
         # get header and participants names
         header = next(reader)
         names = [ i for i in header if i!='' ]
-        balance = { name: 0 for name in names }
+        balance = { name: Decimal(0) for name in names }
 
         # print
         print ''.join(['{:15}'.format(h) for h in header])
         print '-'*15*len(header)
 
         # compute balance row by row
+        exp = -2
         for row in reader:
 
             rownames = []
-            total = 0.
+            total = Decimal(0)
             # compute running total, find out who participated, update balance
             for i in range(len(row)):
                 if header[i]=='': continue
                 if row[i].strip()=='-': continue
                 rownames += [ header[i] ]
-                amount = float(row[i])
+                d = Decimal(row[i])
+                amount = d
                 total += amount
                 balance[header[i]] -= amount
+                # find working decimal precision
+                exp = min(exp, d.as_tuple().exponent)
 
             # correct the balance by adding the share of everybody
             for n in rownames:
-                balance[n] += total/len(rownames)
+                balance[n] += total/Decimal(len(rownames))
 
             print(''.join(['{:15}'.format(h) for h in row]))
+
+        # round to the nearest value (using exponent exp)
+        for name in balance.keys():
+            balance[name] = balance[name].quantize(Decimal('10')**exp)
 
         print '-'*15*len(header)
         print ''.join(['{:15}'.format(str(balance.get(h, ''))) for h in header])

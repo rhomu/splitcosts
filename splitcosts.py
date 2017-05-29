@@ -11,7 +11,7 @@
 #   python splitcosts.py file
 #
 
-import sys, csv
+import sys, csv, re
 from decimal import Decimal
 import decimal
 
@@ -84,8 +84,12 @@ def get_balance(filename):
             for i in range(len(row)):
                 if header[i]=='': continue
                 if row[i].strip()=='-': continue
-                rownames += [ header[i] ]
-                d = Decimal(row[i])
+                m = re.match(r"\((.+?)\)", row[i].strip())
+                if m!=None:
+                    d = Decimal(m.group(1))
+                else:
+                    rownames += [ header[i] ]
+                    d = Decimal(row[i] if row[i].strip()!='' else '0')
                 amount = d
                 total += amount
                 balance[header[i]] -= amount

@@ -14,12 +14,13 @@ Each subsequent line defines the contributions of each person to a single event.
 Each entry can be:
 * a number, to indicate that the person did participate the event and paid the
   given amount.
-* empty or `0` to indicate that the person did participate the event but did not
+* empty or `0`, to indicate that the person did participate the event but did not
   pay anything.
-* `-` to indicate that the person did not participate the event and does not
+* `-`, to indicate that the person did not participate the event and does not
   need to pay for it.
 * a number in parentheses, to indicate that the person paid for others, i.e.
   paid but did not participate.
+
 See example file in this directory.
 
 Once the total balance is obtained a simple algorithm computes a list of

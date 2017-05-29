@@ -10,16 +10,16 @@ Usage: `python splitcosts.py file`
 
 The first line is the header line and gives the name of participants. Any column
 whose header line is empty is discarded. This is useful to include comments.
-Each subsequent line defines the contributions of each person to a single event.
-Each entry can be:
-* a number, to indicate that the person did participate the event and paid the
+Each subsequent line defines the financial contributions of each person to a 
+single activity. Each entry can be:
+* a number, to indicate that the person did participate the activity and paid the
   given amount.
-* empty or `0`, to indicate that the person did participate the event but did not
+* empty or `0`, to indicate that the person did participate the activity but did not
   pay anything.
-* `-`, to indicate that the person did not participate the event and does not
+* `-`, to indicate that the person did not participate the activity and does not
   need to pay for it.
 * a number in parentheses, to indicate that the person paid for others, i.e.
-  paid but did not participate.
+  paid but did not participate the activity.
 
 See example file in this directory.
 

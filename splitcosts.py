@@ -15,6 +15,22 @@ import sys, csv, re
 from decimal import Decimal
 import decimal
 
+DISPLAY_LENGTH = 23  # my favorite number
+
+
+def trim(string, length):
+    """Trim string to be of a certain length. For displaying.
+
+    Inputs:
+        string -- The string to trim.
+        length -- The maximal allowed length. Must be bigger than 3.
+
+    Output:       Trimed string.
+    """
+    assert length > 3
+    return string[:length-3] + '...' if len(string)>length else string
+
+
 def settle(balance):
     """Solve for the transaction to be done given a list of balances. When the
     balance is postitive (negative) it means that the corresponding person will
@@ -71,8 +87,8 @@ def get_balance(filename):
         balance = { name: Decimal(0) for name in names }
 
         # print
-        print ''.join(['{:15}'.format(h) for h in header])
-        print '-'*15*len(header)
+        print ''.join([('{:' + str(DISPLAY_LENGTH) + '}').format(h) for h in header])
+        print '-'*DISPLAY_LENGTH*(len(header) - 1)
 
         # compute balance row by row
         exp = -2
@@ -100,14 +116,14 @@ def get_balance(filename):
             for n in rownames:
                 balance[n] += total/Decimal(len(rownames))
 
-            print(''.join(['{:15}'.format(h) for h in row]))
+            print(''.join([('{:' + str(DISPLAY_LENGTH) + '}').format(trim(str(h), DISPLAY_LENGTH-1)) for h in row]))
 
         # round to the nearest value (using exponent exp)
         for name in balance.keys():
             balance[name] = balance[name].quantize(Decimal('10')**exp)
 
-        print '-'*15*len(header)
-        print ''.join(['{:15}'.format(str(balance.get(h, ''))) for h in header])
+        print '-'*DISPLAY_LENGTH*(len(header) - 1)
+        print ''.join([('{:' + str(DISPLAY_LENGTH) + '}').format(str(balance.get(h, ''))) for h in header])
 
     return balance
 
